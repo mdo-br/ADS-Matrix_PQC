@@ -385,33 +385,79 @@ def grafico_comparacao_algoritmos(df, plots_subdir):
     plt.show()
 
 def grafico_analise_acordos_chave(df, plots_subdir):
-    """Gráfico específico para análise de acordos de chave"""
-    fig, axes = plt.subplots(2, 2, figsize=(15, 12))
-    fig.suptitle('Análise de Acordos de Chave - Clássico vs Híbrido', fontsize=16, fontweight='bold')
-    
-    # Tempo de KEM por tipo de acordo
-    sns.boxplot(data=df, x='acordo', y='kem_ms_mean', ax=axes[0,0])
-    axes[0,0].set_title('Tempo de KEM por Tipo de Acordo')
-    axes[0,0].set_ylabel('Tempo (ms)')
-    
-    # Largura de banda KEM por tipo de acordo  
-    sns.boxplot(data=df, x='acordo', y='kem_bw_mean', ax=axes[0,1])
-    axes[0,1].set_title('Largura de Banda KEM por Tipo de Acordo')
-    axes[0,1].set_ylabel('Largura de Banda (bytes)')
-    
-    # Comparação de latência total por acordo
-    sns.boxplot(data=df, x='acordo', y='latencia_total', ax=axes[1,0])
-    axes[1,0].set_title('Latência Total por Tipo de Acordo')
-    axes[1,0].set_ylabel('Latência (ms)')
-    
-    # Throughput por tipo de acordo
-    sns.boxplot(data=df, x='acordo', y='throughput', ax=axes[1,1])
-    axes[1,1].set_title('Throughput por Tipo de Acordo')
-    axes[1,1].set_ylabel('Throughput (msg/s)')
-    
+    acordo_types = df['acordo'].unique()
+    colors = ['#1f77b4', '#ff7f0e']
+    # Boxplots lado a lado para tempo de KEM e largura de banda de KEM por acordo de chave
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    sns.boxplot(data=df, x='acordo', y='kem_ms_mean', ax=axes[0], palette=colors[:len(acordo_types)])
+    axes[0].set_title('Tempo de KEM por Tipo de Acordo (Boxplot)')
+    axes[0].set_ylabel('Tempo de KEM (ms)')
+    axes[0].set_xlabel('Tipo de Acordo')
+    sns.boxplot(data=df, x='acordo', y='kem_bw_mean', ax=axes[1], palette=colors[:len(acordo_types)])
+    axes[1].set_title('Largura de Banda KEM por Tipo de Acordo (Boxplot)')
+    axes[1].set_ylabel('Largura de Banda KEM (bytes)')
+    axes[1].set_xlabel('Tipo de Acordo')
     plt.tight_layout()
-    plt.savefig(plots_subdir / 'analise_acordos_chave.png', dpi=300, bbox_inches='tight')
-    plt.show()
+    plt.savefig(plots_subdir / 'acordos_kem_boxplots_lado_a_lado.png', dpi=300)
+    plt.close()
+    """Gráficos de barras para análise de acordos de chave, com intervalo de confiança visual, cada métrica em uma figura separada."""
+    import numpy as np
+    acordo_types = df['acordo'].unique()
+    colors = ['#1f77b4', '#ff7f0e']
+
+    # Função auxiliar para plotar barras com IC
+    def plot_bar_ic(metric, ci_metric, ylabel, title, filename, scale=1.0):
+        means = df.groupby('acordo')[metric].mean() * scale
+        cis = df.groupby('acordo')[ci_metric].mean() * scale
+        x = np.arange(len(acordo_types))
+        fig, ax = plt.subplots(figsize=(8,6))
+        bars = ax.bar(x, means, yerr=cis, capsize=10, color=colors[:len(acordo_types)], alpha=0.8)
+        ax.set_xticks(x)
+        ax.set_xticklabels(acordo_types)
+        ax.set_ylabel(ylabel)
+        ax.set_title(title)
+        # Adiciona valor numérico acima do topo da barra de erro e desenha manualmente o cap
+        for i, bar in enumerate(bars):
+            y = bar.get_height()
+            ci = cis.iloc[i]
+            center_x = bar.get_x() + bar.get_width()/2
+            # Desenha manualmente o cap da barra de erro
+            cap_width = bar.get_width() * 0.5
+            ax.plot([center_x - cap_width/2, center_x + cap_width/2], [y + ci, y + ci], color='black', lw=2)
+            # Adiciona valor numérico acima do cap
+            ax.text(center_x, y + ci + (0.03 * y), f'{y:.2f}',
+                    ha='center', va='bottom', fontweight='bold')
+        plt.tight_layout()
+        plt.savefig(plots_subdir / filename, dpi=300)
+        plt.close()
+
+    # Tempo de KEM por tipo de acordo
+    plot_bar_ic('kem_ms_mean', 'kem_ms_ci95', 'Tempo de KEM (ms)',
+                'Tempo de KEM por Tipo de Acordo (com IC95)', 'acordos_kem_ms.png')
+
+    # Adiciona boxplot para tempo de KEM por tipo de acordo
+    plt.figure(figsize=(8,6))
+    sns.boxplot(data=df, x='acordo', y='kem_ms_mean', palette=colors[:len(acordo_types)])
+    plt.title('Tempo de KEM por Tipo de Acordo (Boxplot)')
+    plt.ylabel('Tempo de KEM (ms)')
+    plt.xlabel('Tipo de Acordo')
+    plt.tight_layout()
+    plt.savefig(plots_subdir / 'acordos_kem_ms_boxplot.png', dpi=300)
+    plt.close()
+
+    # Largura de banda KEM por tipo de acordo
+    plot_bar_ic('kem_bw_mean', 'kem_bw_ci95', 'Largura de Banda KEM (bytes)',
+                'Largura de Banda KEM por Tipo de Acordo (com IC95)', 'acordos_kem_bw.png')
+
+    # Latência total por tipo de acordo
+    # Calcula o IC95 da latência total como a soma dos ICs de KEM e cifragem
+    df['latencia_total_ci95'] = df['kem_ms_ci95'] + df['cipher_ms_ci95']
+    plot_bar_ic('latencia_total', 'latencia_total_ci95', 'Latência Total (ms)',
+                'Latência Total por Tipo de Acordo (com IC95)', 'acordos_latencia_total.png')
+
+    # Throughput por tipo de acordo
+    plot_bar_ic('throughput', 'kem_ms_ci95', 'Throughput (msg/s)',
+                'Throughput por Tipo de Acordo (com IC95)', 'acordos_throughput.png')
 
 def grafico_overhead_protocolos(df, plots_dir):
     """Gráfico de overhead dos protocolos de acordo"""
@@ -699,19 +745,28 @@ def grafico_largura_banda_kem_vs_rotacoes(df, plots_subdir):
     plt.close()
 
 def grafico_overhead_temporal_por_cenario(df, plots_dir):
+    # Versão boxplot do overhead temporal por cenário
+    plt.figure(figsize=(10,6))
+    sns.boxplot(data=df, x='cenario', y='kem_ms_mean', hue='acordo', palette=['#1f77b4', '#ff7f0e'])
+    plt.ylabel('Tempo Médio de KEM (ms)')
+    plt.title('Overhead Temporal por Cenário (Boxplot)')
+    plt.legend(title='Protocolo')
+    plt.tight_layout()
+    plt.savefig(plots_dir / 'overhead_temporal_por_cenario_boxplot.png', dpi=300)
+    plt.close()
     """Gráfico de barras agrupadas do overhead temporal por cenário"""
-    import matplotlib.pyplot as plt
     cenarios = df['cenario'].unique()
     protocolos = ['Olm-Clássico', 'Olm-Híbrido']
     x = np.arange(len(cenarios))
     width = 0.35
     means = {p: [df[(df['cenario'] == c) & (df['acordo'] == p)]['kem_ms_mean'].mean() for c in cenarios] for p in protocolos}
+    cis = {p: [df[(df['cenario'] == c) & (df['acordo'] == p)]['kem_ms_ci95'].mean() for c in cenarios] for p in protocolos}
     plt.figure(figsize=(10,6))
-    plt.bar(x - width/2, means['Olm-Clássico'], width, label='Olm-Clássico')
-    plt.bar(x + width/2, means['Olm-Híbrido'], width, label='Olm-Híbrido')
+    bars1 = plt.bar(x - width/2, means['Olm-Clássico'], width, yerr=cis['Olm-Clássico'], capsize=8, label='Olm-Clássico')
+    bars2 = plt.bar(x + width/2, means['Olm-Híbrido'], width, yerr=cis['Olm-Híbrido'], capsize=8, label='Olm-Híbrido')
     plt.xticks(x, cenarios, rotation=30)
     plt.ylabel('Tempo Médio de KEM (ms)')
-    plt.title('Overhead Temporal por Cenário')
+    plt.title('Overhead Temporal por Cenário (com IC95)')
     plt.legend()
     plt.tight_layout()
     plt.savefig(plots_dir / 'overhead_temporal_por_cenario.png', dpi=300)

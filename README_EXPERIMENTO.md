@@ -138,7 +138,7 @@ graph LR
 
 **Tipo**: Experimento fatorial completo 2×3×4×5
 
-**Repetições**: 30 execuções por configuração para significância estatística
+**Repetições**: 50 execuções por configuração para significância estatística
 
 **Randomização**: Ordem aleatória de execução das configurações
 
@@ -266,7 +266,7 @@ pip install pandas matplotlib seaborn numpy
 ```bash
 # Compilação e execução do experimento
 cd rust_experiment
-cargo run --release --bin main_improved
+cargo run --release
 
 # Os gráficos são gerados automaticamente após o experimento
 # Resultados salvos em: ../results/

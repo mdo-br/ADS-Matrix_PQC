@@ -12,19 +12,19 @@ rust_experiment/Cargo.lock
 Cargo.lock
 
 # Resultados experimentais e dados temporários
-results/
-resultados_*.csv
-*.csv
-*.xlsx
-*.log
-*.tmp
+#results/
+#resultados_*.csv
+#*.csv
+#*.xlsx
+#*.log
+#*.tmp
 
 # Gráficos e plots
-plots/
-*.png
-*.jpg
-*.pdf
-*.svg
+#plots/
+#*.png
+#*.jpg
+#*.pdf
+#*.svg
 
 # Arquivos de teste temporários
 test_fix.py

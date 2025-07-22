@@ -75,12 +75,12 @@ Para detalhes completos, consulte `REFERENCIAS_ACADEMICAS_WORKLOAD.md`.
 - Eficiência energética (throughput/latência)
 
 ### Análise Estatística
-- 30 repetições por configuração para robustez estatística
-- Testes de normalidade (Shapiro-Wilk, Kolmogorov-Smirnov)
-- Média, desvio padrão, intervalos de confiança 95%
-- Análise de variância (ANOVA)
-- Detecção e tratamento de outliers
-- Visualizações estatísticas interativas
+- 50 repetições por configuração para robustez estatística
+  Testes de normalidade (Shapiro-Wilk, Kolmogorov-Smirnov)
+  Média, desvio padrão, intervalos de confiança 95%
+  Análise de variância (ANOVA)
+  Detecção e tratamento de outliers
+  Visualizações estatísticas interativas
 
 ## Cenários do Workload Realista
 
@@ -133,7 +133,7 @@ Seguindo a metodologia de Raj Jain para experimentos de sistemas:
 2. **Sistema**: Simulador Matrix/Olm/Megolm em Rust
 3. **Métricas**: Latência, throughput, largura de banda, eficiência energética
 4. **Fatores**: Protocolo de acordo (X25519 vs X25519+Kyber768), algoritmo de cifra (AES-GCM, ChaCha20, Megolm-Like), cenário de uso, padrão de tráfego
-5. **Design**: Experimento fatorial com 30 repetições por configuração
+5. **Design**: Experimento fatorial com 50 repetições por configuração
 6. **Análise**: Estatística descritiva, testes de normalidade, intervalos de confiança, visualizações
 
 ### Tipos de Experimentos
@@ -397,7 +397,7 @@ Se utilizar este trabalho em pesquisa acadêmica, por favor cite:
 
 Para informações técnicas detalhadas, consulte:
 
-- **[README_EXPERIMENT.md](README_EXPERIMENT.md)**: Documentação técnica completa
+- **[README_EXPERIMENT.md](README_EXPERIMENTO.md)**: Documentação técnica completa
 - **[INSIGHTS_ARTIGOS_WORKLOAD.md](INSIGHTS_ARTIGOS_WORKLOAD.md)**: Fundamentação acadêmica
 - **[REFERENCIAS_ACADEMICAS_WORKLOAD.md](REFERENCIAS_ACADEMICAS_WORKLOAD.md)**: Referências bibliográficas
 
