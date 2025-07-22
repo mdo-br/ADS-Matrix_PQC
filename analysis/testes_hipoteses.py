@@ -80,6 +80,7 @@ def test_protocol_difference(df):
         print(f"  Resultado: Não rejeitar H₀ (p ≥ {alpha})")
     
     # Tamanho do efeito (Cohen's d)
+    # Calcula o tamanho do efeito usando Cohen's d
     pooled_std = np.sqrt(((len(classico)-1)*classico.var() + (len(hibrido)-1)*hibrido.var()) / (len(classico)+len(hibrido)-2))
     cohens_d = (hibrido.mean() - classico.mean()) / pooled_std
     print(f"  Cohen's d: {cohens_d:.4f}")
