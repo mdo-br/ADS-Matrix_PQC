@@ -1,0 +1,87 @@
+ANÁLISE ESTATÍSTICA - EXPERIMENTO MATRIX
+============================================================
+Carregando dados de: ../results/resultados_normality_check_20250716_202824.csv
+Dados carregados: 120 observações
+============================================================
+TESTE 1: DIFERENÇA ENTRE PROTOCOLOS
+============================================================
+Olm-Clássico: n=60, μ=5.2473, σ=6.7478
+Olm-Híbrido:  n=60, μ=9.2872, σ=11.9197
+
+Teste t bilateral:
+  H₀: μ_híbrido = μ_clássico
+  H₁: μ_híbrido ≠ μ_clássico
+  t = 2.2846, p = 0.024121
+
+Teste t unilateral:
+  H₀: μ_híbrido ≤ μ_clássico
+  H₁: μ_híbrido > μ_clássico
+  t = 2.2846, p = 0.012060
+  Resultado: Rejeitar H₀ (p < 0.05)
+  Conclusão: Protocolo híbrido é significativamente mais lento
+  Cohen's d: 0.4171
+
+--- Largura de Banda ---
+  Overhead de largura de banda: 7100.0%
+
+============================================================
+TESTE 2: ANOVA - DIFERENÇAS ENTRE CENÁRIOS
+============================================================
+Estatísticas por cenário:
+  SmallChat: n=30, μ=0.2252, σ=0.0614
+  MediumGroup: n=30, μ=1.1582, σ=0.3310
+  LargeChannel: n=30, μ=4.6440, σ=1.3303
+  SystemChannel: n=30, μ=23.0417, σ=6.5003
+
+ANOVA One-Way:
+  H₀: Todas as médias são iguais
+  H₁: Pelo menos uma média é diferente
+  F = 310.5130, p = 0.000000
+  Resultado: Rejeitar H₀ (p < 0.05)
+  Conclusão: Há diferença significativa entre cenários
+
+============================================================
+TESTE 3: ANOVA - PADRÕES DE TRÁFEGO
+============================================================
+Estatísticas por padrão de tráfego:
+  Constant: n=24, μ=6328.22, σ=5116.31
+  Burst: n=24, μ=41830.29, σ=31722.04
+  Periodic: n=24, μ=22595.96, σ=17871.30
+  Random: n=24, μ=17203.63, σ=13419.77
+  Realistic: n=24, μ=24996.77, σ=19312.19
+
+ANOVA One-Way:
+  H₀: Todos os padrões têm a mesma média
+  H₁: Pelo menos um padrão é diferente
+  F = 10.5429, p = 0.000000
+  Resultado: Rejeitar H₀ (p < 0.05)
+  Conclusão: Padrões de tráfego têm impacto significativo
+
+============================================================
+TESTE 4: EQUIVALÊNCIA DE ALGORITMOS DE CIFRA
+============================================================
+Estatísticas por algoritmo de cifra:
+  AES-GCM: n=40, μ=22628.95, σ=22632.78
+  ChaCha20: n=40, μ=22579.05, σ=22616.00
+  Megolm-Like: n=40, μ=22564.92, σ=22619.38
+
+ANOVA One-Way:
+  F = 0.0001, p = 0.999912
+
+Comparações pareadas (Teste t):
+  AES-GCM vs ChaCha20: t=0.0099, p=0.9922, diff=0.22%
+  AES-GCM vs Megolm-Like: t=0.0127, p=0.9899, diff=0.28%
+  ChaCha20 vs Megolm-Like: t=0.0028, p=0.9978, diff=0.06%
+
+============================================================
+TESTE 5: CORRELAÇÕES
+============================================================
+Correlação: num_msgs vs kem_ms_mean
+  r = 0.9120, p = 0.000000
+
+Correlação: rotacoes vs kem_bw_mean
+  r = 0.6290, p = 0.000000
+
+============================================================
+ANÁLISE CONCLUÍDA
+============================================================

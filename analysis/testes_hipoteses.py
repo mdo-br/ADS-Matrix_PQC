@@ -12,6 +12,18 @@ from scipy.stats import ttest_ind, f_oneway, shapiro, levene, mannwhitneyu
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
+import sys
+class DualWriter:
+    def __init__(self, file_path):
+        self.terminal = sys.stdout
+        self.log = open(file_path, "w", encoding="utf-8")
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+    def flush(self):
+        self.terminal.flush()
+        self.log.flush()
+
 
 def load_data():
     """Carregar dados do experimento"""
@@ -187,6 +199,10 @@ def test_correlation(df):
 
 def main():
     """Executar todos os testes"""
+    # Redireciona sys.stdout para DualWriter
+    report_path = Path(__file__).parent / "report_testes_hipoteses.txt"
+    sys.stdout = DualWriter(report_path)
+
     print("ANÁLISE ESTATÍSTICA - EXPERIMENTO MATRIX")
     print("="*60)
     
@@ -202,6 +218,9 @@ def main():
     print("\n" + "="*60)
     print("ANÁLISE CONCLUÍDA")
     print("="*60)
+    # Restaura sys.stdout
+    sys.stdout.log.close()
+    sys.stdout = sys.stdout.terminal
 
 if __name__ == "__main__":
     main()

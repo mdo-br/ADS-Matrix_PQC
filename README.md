@@ -14,25 +14,25 @@ O experimento implementa um simulador de sistema de mensagens baseado nos protoc
 ## Estrutura do Repositório
 
 ```
-├── rust_experiment/           # Implementação do experimento em Rust
+├── rust_experiment/           # Experimento principal em Rust
 │   ├── src/
-│   │   ├── main.rs           # Experimento básico
-│   │   ├── main_improved.rs  # Experimento com workload realista
-│   │   ├── main_normality_check.rs  # Experimento com análise de normalidade
-│   │   ├── main_benchmark.rs # Experimento de benchmark
-│   │   ├── workload.rs       # Módulo de workload fundamentado academicamente
-│   │   └── statistical_tests.rs  # Testes estatísticos
-│   └── Cargo.toml
-├── analysis/                  # Scripts de análise em Python
-│   ├── gerar_graficos_workload.py
-│   ├── gerar_graficos_normality.py
-│   ├── analise_workload_realista.py
-│   └── analise_resultados.ipynb
+│   │   ├── main.rs           # Experimento principal
+│   │   ├── workload.rs       # Módulo de workload realista
+│   ├── Cargo.toml
+│   ├── experimento_output.log
+├── analysis/                  # Scripts de análise estatística e geração de gráficos
+│   ├── gerar_graficos.py      # Geração de gráficos dos resultados
+│   ├── testes_hipoteses.py    # Testes estatísticos em Python
+│   ├── run_with_venv.sh       # Script para rodar análise com venv
 ├── results/                   # Resultados dos experimentos (CSV)
-├── plots/                     # Gráficos gerados
-├── README_EXPERIMENT.md       # Documentação técnica completa
-├── INSIGHTS_ARTIGOS_WORKLOAD.md  # Fundamentação acadêmica
-└── REFERENCIAS_ACADEMICAS_WORKLOAD.md  # Referências bibliográficas
+│   ├── resultados_normality_check_*.csv
+│   ├── graficos/              # Gráficos específicos de resultados
+├── plots/                     # Gráficos gerados automaticamente
+│   ├── graficos_normality_check_*/
+├── README.md                  # Documentação resumida do projeto
+├── README_EXPERIMENT.md       # Documentação técnica detalhada
+├── REFERENCIAS_ACADEMICAS_WORKLOAD.md  # Referências bibliográficas
+├── requirements.txt           # Dependências Python
 ```
 
 ## Execução Rápida
@@ -42,17 +42,9 @@ O experimento implementa um simulador de sistema de mensagens baseado nos protoc
 git clone <repository-url>
 cd matrix
 
-# Executar experimento com workload realista (recomendado)
 cd rust_experiment
-cargo run --release --bin main_improved
-
-# Executar experimento com análise de normalidade
-cargo run --release --bin main_normality_check
-
-# Executar benchmark de performance
-cargo run --release --bin main_benchmark
-
-# Os gráficos são gerados automaticamente após cada experimento
+cargo run --release
+# Os gráficos são gerados automaticamente após o experimento
 ```
 
 ## Fundamentação Acadêmica
@@ -181,55 +173,15 @@ pip install -r requirements.txt
 
 ## Uso
 
-### Experimentos Disponíveis
-
-#### 1. Experimento Básico
+### Execução do Experimento
 ```bash
 cd rust_experiment
-cargo run --release --bin main
-```
-
-#### 2. Experimento com Workload Realista (Recomendado)
-```bash
-cd rust_experiment
-cargo run --release --bin main_improved
-```
-
-#### 3. Experimento com Análise de Normalidade
-```bash
-cd rust_experiment
-cargo run --release --bin main_normality_check
-```
-
-#### 4. Benchmark de Performance
-```bash
-cd rust_experiment
-cargo run --release --bin main_benchmark
+cargo run --release
 ```
 
 ### Geração de Gráficos
 
-Os gráficos são gerados automaticamente após cada experimento, mas também podem ser gerados manualmente:
-
-#### Gráficos do Workload Realista
-```bash
-cd analysis
-python3 gerar_graficos_workload.py
-```
-
-#### Gráficos da Análise de Normalidade
-```bash
-cd analysis
-python3 gerar_graficos_normality.py
-```
-
-#### Análise Jupyter
-```bash
-cd analysis
-jupyter notebook analise_resultados.ipynb
-```
-
-Os gráficos são salvos na pasta `plots/`.
+Os gráficos são gerados automaticamente após o experimento e salvos na pasta `plots/`. Caso queira gerar gráficos manualmente ou realizar análise Jupyter, utilize os scripts em `analysis/` conforme necessário.
 
 ## Estrutura de Resultados
 
