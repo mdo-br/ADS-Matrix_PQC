@@ -1,0 +1,48 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Rust - Build artifacts e dependências
+rust_experiment/target/
+rust_experiment/Cargo.lock
+**/target/
+Cargo.lock
+
+# Resultados experimentais e dados temporários
+results/
+resultados_*.csv
+*.csv
+*.xlsx
+*.log
+*.tmp
+
+# Gráficos e plots
+plots/
+*.png
+*.jpg
+*.pdf
+*.svg
+
+# Arquivos de teste temporários
+test_fix.py
+rust_experiment/src/test_quick.rs
+test_*.py
+test_*.rs
+
+# IDEs e editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Outputs e caches
+*.out
+cache/ 

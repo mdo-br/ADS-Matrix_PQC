@@ -1,0 +1,39 @@
+Iniciando: SystemChannel + Realistic + Olm-Híbrido + AES-GCM (118/120)
+  Repetição 1/30
+  Repetição 11/30
+  Repetição 21/30
+Iniciando: SystemChannel + Realistic + Olm-Híbrido + ChaCha20 (119/120)
+  Repetição 1/30
+  Repetição 11/30
+  Repetição 21/30
+Iniciando: SystemChannel + Realistic + Olm-Híbrido + Megolm-Like (120/120)
+  Repetição 1/30
+  Repetição 11/30
+  Repetição 21/30
+Experimento com workload realista concluído!
+Resultados salvos em: ../results/resultados_workload_realista_20250712_081222.csv
+Experimento concluído com sucesso!
+
+Gerando gráficos dos resultados...
+Gráficos gerados com sucesso!
+Arquivos salvos em: ../plots/
+Saída do script:
+GERANDO GRÁFICOS DO WORKLOAD REALISTA
+============================================================
+Carregando dados de: ../results/resultados_workload_realista_20250712_081222.csv
+Salvando gráficos em: ../plots/graficos_workload_realista_20250712_081222
+Gerando gráfico de desempenho por cenário...
+Gerando gráfico de deempenho por padrão de tráfego...
+Gerando gráfico de distribuição de tipos de mensagens...
+Gerando gráfico de eficiência energética...
+Gerando gráfico de latência vs throughput...
+Gerando gráfico comparativo de algoritmos...
+Gerando gráfico de análise de acordos de chave...
+
+Gráficos gerados com sucesso!
+Arquivos salvos em: ../plots/graficos_workload_realista_20250712_081222
+
+
+real    1354m2.652s
+user    90m44.700s
+sys     3m49.814s
