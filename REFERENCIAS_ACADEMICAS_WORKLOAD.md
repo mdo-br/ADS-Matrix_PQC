@@ -127,6 +127,6 @@ O workload implementado foi validado através de:
 
 ## Conclusão
 
-O módulo de workload do experimento Matrix é solidamente fundamentado em literatura acadêmica de qualidade, utilizando dados empíricos de múltiplas aplicações de mensagens instantâneas reais. Esta fundamentação garante que os resultados dos experimentos sejam representativos de cenários reais de uso, aumentando a validade externa dos resultados obtidos.
+O módulo de workload do experimento Matrix é  fundamentado em literatura acadêmica, utilizando dados empíricos de múltiplas aplicações de mensagens instantâneas reais. Esta fundamentação garante que os resultados dos experimentos sejam representativos de cenários reais de uso, aumentando a validade externa dos resultados obtidos.
 
-A combinação de múltiplas fontes acadêmicas (2007-2023) e aplicações diversas (AIM, MSN, WhatsApp, WeChat, etc.) proporciona uma base robusta para simulação de workloads realistas em sistemas de comunicação segura.
+A combinação de múltiplas fontes acadêmicas (2007-2023) e aplicações diversas (AIM, MSN, WhatsApp, WeChat, etc.) proporciona uma base para simulação de workloads realistas em sistemas de comunicação segura.

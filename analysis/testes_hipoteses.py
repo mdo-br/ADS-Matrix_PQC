@@ -80,7 +80,13 @@ def test_protocol_difference(df):
         print(f"  Resultado: Não rejeitar H₀ (p ≥ {alpha})")
     
     # Tamanho do efeito (Cohen's d)
-    # Calcula o tamanho do efeito usando Cohen's d
+    # Calcula o tamanho do efeito usando Cohen's d que 
+    # Cohen's d mede o quanto as médias dos dois grupos 
+    # diferem em termos de desvios padrão.
+    # Na prática:
+    # Valores próximos de 0.2 são considerados efeitos pequenos.
+    # Valores em torno de 0.5 são efeitos moderados.
+    # Valores acima de 0.8 são efeitos grandes.
     pooled_std = np.sqrt(((len(classico)-1)*classico.var() + (len(hibrido)-1)*hibrido.var()) / (len(classico)+len(hibrido)-2))
     cohens_d = (hibrido.mean() - classico.mean()) / pooled_std
     print(f"  Cohen's d: {cohens_d:.4f}")
@@ -89,6 +95,7 @@ def test_protocol_difference(df):
     print(f"\n--- Largura de Banda ---")
     bw_classico = df[df['acordo'] == 'Olm-Clássico']['kem_bw_mean']
     bw_hibrido = df[df['acordo'] == 'Olm-Híbrido']['kem_bw_mean']
+    # Calcula o overhead de largura de banda para o protocolo híbrido
     overhead_bw = ((bw_hibrido.mean() - bw_classico.mean()) / bw_classico.mean()) * 100
     print(f"  Overhead de largura de banda: {overhead_bw:.1f}%")
     
@@ -100,6 +107,7 @@ def test_scenario_anova(df):
     print("TESTE 2: ANOVA - DIFERENÇAS ENTRE CENÁRIOS")
     print("="*60)
     
+    # Agrupa os dados por cenário e calcula as médias
     cenarios = df['cenario'].unique()
     grupos = [df[df['cenario'] == c]['kem_ms_mean'] for c in cenarios]
     
@@ -108,6 +116,10 @@ def test_scenario_anova(df):
         grupo = grupos[i]
         print(f"  {cenario}: n={len(grupo)}, μ={grupo.mean():.4f}, σ={grupo.std():.4f}")
     
+    # Utiliza ANOVA para verificar se há diferenças significativas entre os cenários
+    # A ANOVA One-Way é usada para comparar as médias de três ou mais grupos
+    # A hipótese nula (H₀) é que todas as médias são iguais
+    # A hipótese alternativa (H₁) é que pelo menos uma média é diferente
     f_stat, p_value = f_oneway(*grupos)
     print(f"\nANOVA One-Way:")
     print(f"  H₀: Todas as médias são iguais")
@@ -129,6 +141,7 @@ def test_traffic_pattern_anova(df):
     print("TESTE 3: ANOVA - PADRÕES DE TRÁFEGO")
     print("="*60)
     
+    # Agrupa os dados por padrão de tráfego e calcula as médias
     padroes = df['padrao_trafego'].unique()
     grupos = [df[df['padrao_trafego'] == p]['cipher_ms_mean'] for p in padroes]
     
@@ -137,6 +150,10 @@ def test_traffic_pattern_anova(df):
         grupo = grupos[i]
         print(f"  {padrao}: n={len(grupo)}, μ={grupo.mean():.2f}, σ={grupo.std():.2f}")
     
+    # Utiliza ANOVA para verificar se há diferenças significativas entre os padrões de tráfego
+    # A hipótese nula (H₀) é que todos os padrões têm a mesma média
+    # A hipótese alternativa (H₁) é que pelo menos um padrão é diferente
+    # A ANOVA One-Way é adequada para comparar as médias de três ou mais grupos
     f_stat, p_value = f_oneway(*grupos)
     print(f"\nANOVA One-Way:")
     print(f"  H₀: Todos os padrões têm a mesma média")
@@ -158,6 +175,7 @@ def test_cipher_equivalence(df):
     print("TESTE 4: EQUIVALÊNCIA DE ALGORITMOS DE CIFRA")
     print("="*60)
     
+    # Agrupa os dados por algoritmo de cifra e calcula as médias
     cifras = df['cifra'].unique()
     grupos = [df[df['cifra'] == c]['cipher_ms_mean'] for c in cifras]
     
@@ -166,6 +184,11 @@ def test_cipher_equivalence(df):
         grupo = grupos[i]
         print(f"  {cifra}: n={len(grupo)}, μ={grupo.mean():.2f}, σ={grupo.std():.2f}")
     
+    
+    # Utiliza ANOVA para verificar se há diferenças significativas entre os algoritmos de cifra
+    # A hipótese nula (H₀) é que todos os algoritmos têm a mesma média
+    # A hipótese alternativa (H₁) é que pelo menos um algoritmo é diferente
+    # A ANOVA One-Way é adequada para comparar as médias de três ou mais grupos
     f_stat, p_value = f_oneway(*grupos)
     print(f"\nANOVA One-Way:")
     print(f"  F = {f_stat:.4f}, p = {p_value:.6f}")
@@ -184,16 +207,16 @@ def test_correlation(df):
     print("\n" + "="*60)
     print("TESTE 5: CORRELAÇÕES")
     print("="*60)
-    
-    # Correlação entre número de mensagens e latência KEM
+
+    # Correlação de Pearson entre número de mensagens e latência KEM
     if 'num_msgs' in df.columns:
         corr, p_value = stats.pearsonr(df['num_msgs'], df['kem_ms_mean'])
         print(f"Correlação: num_msgs vs kem_ms_mean")
         print(f"  r = {corr:.4f}, p = {p_value:.6f}")
     else:
         print("Coluna 'num_msgs' não encontrada.")
-    
-    # Correlação entre rotações e largura de banda
+
+    # Correlação de Pearson entre rotações e largura de banda
     corr2, p_value2 = stats.pearsonr(df['rotacoes'], df['kem_bw_mean'])
     print(f"\nCorrelação: rotacoes vs kem_bw_mean")
     print(f"  r = {corr2:.4f}, p = {p_value2:.6f}")

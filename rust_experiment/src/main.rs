@@ -146,6 +146,7 @@ use std::process::Command;
 use chrono;
 
 // --- WORKLOAD REALISTA ---
+// Importa tipos de mensagens, padrões de tráfego e cenários de uso
 use workload::{
     MessageType, TrafficPattern, UsageScenario,
     MessageGenerator, TrafficGenerator,
@@ -346,8 +347,11 @@ fn detect_outliers(data: &[f64], label: &str) -> (Vec<usize>, Vec<usize>, Vec<f6
     let iqr = q3 - q1;
     
     // Limites para outliers
+    // Outliers moderados: 1.5 × IQR
     let lower_bound = q1 - 1.5 * iqr;
     let upper_bound = q3 + 1.5 * iqr;
+
+    // Outliers extremos: 3.0 × IQR
     let extreme_lower = q1 - 3.0 * iqr;
     let extreme_upper = q3 + 3.0 * iqr;
     
