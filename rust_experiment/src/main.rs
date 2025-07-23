@@ -356,12 +356,17 @@ fn detect_outliers(data: &[f64], label: &str) -> (Vec<usize>, Vec<usize>, Vec<f6
     let mut extreme_outliers = Vec::new();
     let mut cleaned_data = Vec::new();
     
+    // Itera sobre os dados e classifica os valores
     for (i, &value) in data.iter().enumerate() {
+        // Verifica se o valor é um outlier moderado ou extremo
         if value < extreme_lower || value > extreme_upper {
+            // Adiciona a lista de outliers extremos
             extreme_outliers.push(i);
         } else if value < lower_bound || value > upper_bound {
+            // Adiciona a lista de outliers moderados
             outliers.push(i);
         } else {
+            // Adiciona à lista de dados limpos
             cleaned_data.push(value);
         }
     }
@@ -482,9 +487,10 @@ fn calculate_adaptive_stats(data: &[f64], label: &str) -> Stats {
     // Passo 3: Verifica normalidade nos dados tratados
     let is_normal = check_normality(&data_for_analysis, label);
     
-    // Passo 4: Calcula estatísticas apropriadas baseadas na normalidade
+    // Log dos outliers detectados
     let total_outliers = outliers.len() + extreme_outliers.len();
     
+    // Passo 4: Calcula estatísticas apropriadas baseadas na normalidade
     if is_normal {
         println!("  [ESTATÍSTICAS] {}: Usando estatísticas paramétricas (média, desvio padrão)", label);
         let mut stats = calculate_parametric_stats(&data_for_analysis, total_outliers, extreme_outliers.len(), original_size);
@@ -494,143 +500,6 @@ fn calculate_adaptive_stats(data: &[f64], label: &str) -> Stats {
         println!("  [ESTATÍSTICAS] {}: Usando estatísticas robustas (mediana, MAD)", label);
         calculate_robust_stats(&data_for_analysis, total_outliers, extreme_outliers.len(), original_size)
     }
-}
-
-/// Executa análise estatística completa usando script Python
-/// 
-/// Esta função chama o script Python que realiza análise estatística
-/// usando bibliotecas científicas (scipy, statsmodels, pandas, numpy).
-/// 
-/// Recursos implementados:
-/// - Testes de normalidade: Shapiro-Wilk, Kolmogorov-Smirnov, Anderson-Darling
-/// - Comparações estatísticas: t-test, Mann-Whitney U, Welch's t-test
-/// - Análise de múltiplos grupos: ANOVA, Kruskal-Wallis
-/// - Testes post-hoc: Tukey HSD, Dunn
-/// - Testes de equivalência: TOST (Two One-Sided Tests)
-/// - Análise de tamanho do efeito: Cohen's d, Cliff's delta, Eta-squared
-/// - Análise de correlação: Pearson, Spearman, Kendall
-/// 
-/// Gerenciamento de ambiente:
-/// - Usa ambiente virtual Python (venv) quando disponível
-/// - Instala dependências automaticamente
-/// - Implementa fallback para execução sem venv
-/// 
-/// Parâmetros:
-/// - filename: caminho para o arquivo CSV com resultados experimentais
-/// 
-/// Retorna:
-/// - Ok(()) se análise foi bem-sucedida
-/// - Err(Box<dyn std::error::Error>) se houve erro irrecuperável
-fn perform_statistical_analysis_python(filename: &str) -> Result<(), Box<dyn std::error::Error>> {
-    println!("\n=== INICIANDO ANÁLISE ESTATÍSTICA EM PYTHON ===");
-    
-    let python_script = "../analysis/statistical_analysis.py";
-    let venv_path = "../venv";
-    
-    // Verifica se o script Python de análise existe
-    if !Path::new(python_script).exists() {
-        return Err("Script Python de análise estatística não encontrado".into());
-    }
-    
-    // Verifica se o ambiente virtual existe, criando se necessário
-    if !Path::new(venv_path).exists() {
-        println!("  AVISO: Ambiente virtual não encontrado, tentando criar...");
-        
-        // Cria ambiente virtual usando o módulo venv do Python
-        let create_venv = Command::new("python3")
-            .arg("-m")
-            .arg("venv")
-            .arg(venv_path)
-            .output()
-            .map_err(|e| format!("Erro ao criar ambiente virtual: {}", e))?;
-        
-        if !create_venv.status.success() {
-            let stderr = String::from_utf8_lossy(&create_venv.stderr);
-            return Err(format!("Falha ao criar ambiente virtual: {}", stderr).into());
-        }
-        
-        println!("  INFO: Ambiente virtual criado com sucesso");
-    }
-    
-    // Executa o script Python usando o ambiente virtual
-    println!("  Executando análise estatística com venv...");
-    
-    // Configura caminhos para executáveis do ambiente virtual
-    let venv_python = format!("{}/bin/python", venv_path);
-    let venv_pip = format!("{}/bin/pip", venv_path);
-    
-    // Verifica se o executável Python do venv existe
-    if !Path::new(&venv_python).exists() {
-        return Err("Python do ambiente virtual não encontrado".into());
-    }
-    
-    // Instala dependências necessárias para análise estatística
-    println!("  Verificando e instalando dependências...");
-    let install_deps = Command::new(&venv_pip)
-        .arg("install")
-        .arg("--quiet")
-        .arg("scipy")
-        .arg("statsmodels")
-        .arg("pandas")
-        .arg("numpy")
-        .output()
-        .map_err(|e| format!("Erro ao instalar dependências: {}", e))?;
-    
-    if !install_deps.status.success() {
-        let stderr = String::from_utf8_lossy(&install_deps.stderr);
-        println!("  AVISO: Problemas na instalação de dependências: {}", stderr);
-        // Continua mesmo com avisos na instalação
-    }
-    
-    // Executa o script Python de análise estatística
-    let output = Command::new(&venv_python)
-        .arg(python_script)
-        .arg(filename)
-        .output()
-        .map_err(|e| format!("Erro ao executar script Python: {}", e))?;
-    
-    // Verifica se a execução foi bem-sucedida
-    if output.status.success() {
-        println!("  SUCESSO: Análise estatística concluída com sucesso");
-        
-        // Exibe a saída do script Python
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        if !stdout.is_empty() {
-            println!("  Saída do script:");
-            for line in stdout.lines() {
-                println!("    {}", line);
-            }
-        }
-    } else {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        
-        // Implementa fallback: tenta executar sem ambiente virtual
-        println!("  AVISO: Erro com venv, tentando fallback sem ambiente virtual...");
-        println!("  Erro original: {}", stderr);
-        
-        let fallback_output = Command::new("python3")
-            .arg(python_script)
-            .arg(filename)
-            .output()
-            .map_err(|e| format!("Erro no fallback: {}", e))?;
-        
-        if fallback_output.status.success() {
-            println!("  SUCESSO: Análise estatística concluída com sucesso (fallback)");
-            
-            let stdout = String::from_utf8_lossy(&fallback_output.stdout);
-            if !stdout.is_empty() {
-                println!("  Saída do script:");
-                for line in stdout.lines() {
-                    println!("    {}", line);
-                }
-            }
-        } else {
-            let fallback_stderr = String::from_utf8_lossy(&fallback_output.stderr);
-            return Err(format!("Falha na análise estatística (venv e fallback): {}", fallback_stderr).into());
-        }
-    }
-    
-    Ok(())
 }
 
 /// Função principal do experimento com verificação de normalidade
@@ -737,6 +606,8 @@ fn run_normality_aware_experiment() -> String {
                         // Chaves são geradas aleatoriamente usando o gerador de números aleatórios do sistema
                         // Garante que as chaves sejam únicas e seguras para cada execução
                             
+                        // Gera chaves Kyber para Bob, se necessário
+                        // Olm-Híbrido usa Kyber768, então gera chaves públicas e secret
                         let (bob_pk_kyber, bob_sk_kyber) = if *acordo == "Olm-Híbrido" {
                             let (pk, sk) = keypair();
                             (Some(pk), Some(sk))
@@ -808,10 +679,10 @@ fn run_normality_aware_experiment() -> String {
                                     // Atualiza chave e métricas
                                     current_key.copy_from_slice(&shared_secret[..32]);
                                     let elapsed_kem = start_kem.elapsed();
-                                    total_kem_time += elapsed_kem;
-                                    total_rotations += 1;
-                                    total_kem_bandwidth += kem_bandwidth;
-                                    last_rotation = current_time;
+                                    total_kem_time += elapsed_kem;          // Tempo gasto na KEM
+                                    total_rotations += 1;                   // Incrementa contador de rotações
+                                    total_kem_bandwidth += kem_bandwidth;   // Atualiza largura de banda KEM
+                                    last_rotation = current_time;           // Atualiza tempo da última rotação
                                 }
                                 
                                 // Gera mensagem e executa cifragem
@@ -876,11 +747,12 @@ fn run_normality_aware_experiment() -> String {
                         let total_enc_time = start_enc.elapsed();
                         
                         // Armazena resultados desta repetição
-                        kem_times.push(total_kem_time.as_secs_f64() * 1000.0);
-                        cipher_times.push(total_enc_time.as_secs_f64() * 1000.0);
-                        kem_bws.push(total_kem_bandwidth as f64);
-                        msg_bws.push(total_msg_bandwidth as f64);
-                        total_rotations_per_run = total_rotations;
+                        // Coleta tempos de KEM e cifragem, largura de banda e contadores de mensagens
+                        kem_times.push(total_kem_time.as_secs_f64() * 1000.0);      // Tempo KEM em milissegundos
+                        cipher_times.push(total_enc_time.as_secs_f64() * 1000.0);   // Tempo de cifragem em milissegundos
+                        kem_bws.push(total_kem_bandwidth as f64);                   // Largura de banda KEM em bytes
+                        msg_bws.push(total_msg_bandwidth as f64);                   // Largura de banda de mensagens em bytes
+                        total_rotations_per_run = total_rotations;                  // Total de rotações nesta sessão
                     }
                     
                     // Executa análise estatística adaptativa nos dados coletados
@@ -1076,31 +948,9 @@ fn main() {
     println!("  - Dados normais: média, desvio padrão, IC95 (z-score)");
     println!("  - Dados não-normais: mediana, MAD, IC95 (percentis)");
     
-    // Executa análise estatística usando Python
-    println!("\n=== INICIANDO ANÁLISE ESTATÍSTICA ===");
-    match perform_statistical_analysis_python(&results_filename) {
-        Ok(_) => {
-            println!("  SUCESSO: Análise estatística concluída");
-            println!("  Testes realizados em Python:");
-            println!("    - Testes de normalidade: Shapiro-Wilk, K-S, Anderson-Darling");
-            println!("    - Comparações: t-test, Mann-Whitney U, Welch's t-test");
-            println!("    - Múltiplos grupos: ANOVA, Kruskal-Wallis");
-            println!("    - Testes post-hoc: Tukey HSD, Dunn");
-            println!("    - Equivalência: TOST");
-            println!("    - Tamanho do efeito: Cohen's d, Cliff's delta, Eta-squared");
-            println!("    - Correlações: Pearson, Spearman, Kendall");
-        },
-        Err(e) => {
-            println!("  ERRO: Falha na análise estatística: {}", e);
-            println!("  INFO: Continuando sem análise estatística
-            ...");
-        }
-    }
-    
     // Lista arquivos gerados
     println!("\nArquivos gerados:");
     println!("  - CSV de resultados: {}", results_filename);
-    println!("  - Relatório estatístico: {}", results_filename.replace(".csv", "_statistical_report.txt"));
     
     // Executa geração de gráficos
     generate_plots();
